@@ -732,7 +732,7 @@ ScalarFunction ExpFun::GetFunction() {
 struct PowOperator {
 	template <class TA, class TB, class TR>
 	static inline TR Operation(TA base, TB exponent) {
-		int int_exponent = static_cast<int>(exponent);
+		auto int_exponent = static_cast<int>(exponent);
 		if (exponent >= 100 || exponent != static_cast<double>(int_exponent)) {
 			return std::pow(base, exponent);
 		}
