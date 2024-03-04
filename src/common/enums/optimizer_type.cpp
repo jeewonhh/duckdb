@@ -14,7 +14,6 @@ static DefaultOptimizerType internal_optimizer_types[] = {
     {"expression_rewriter", OptimizerType::EXPRESSION_REWRITER},
     {"filter_pullup", OptimizerType::FILTER_PULLUP},
     {"filter_pushdown", OptimizerType::FILTER_PUSHDOWN},
-    {"limit_pushdown", OptimizerType::LIMIT_PUSHDOWN},
     {"regex_range", OptimizerType::REGEX_RANGE},
     {"in_clause", OptimizerType::IN_CLAUSE},
     {"join_order", OptimizerType::JOIN_ORDER},

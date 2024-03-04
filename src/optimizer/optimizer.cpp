@@ -22,7 +22,6 @@
 #include "duckdb/optimizer/rule/list.hpp"
 #include "duckdb/optimizer/statistics_propagator.hpp"
 #include "duckdb/optimizer/topn_optimizer.hpp"
-#include "duckdb/optimizer/limit_pushdown.hpp"
 #include "duckdb/optimizer/unnest_rewriter.hpp"
 #include "duckdb/planner/binder.hpp"
 #include "duckdb/planner/planner.hpp"
@@ -102,11 +101,6 @@ unique_ptr<LogicalOperator> Optimizer::Optimize(unique_ptr<LogicalOperator> plan
 	RunOptimizer(OptimizerType::FILTER_PUSHDOWN, [&]() {
 		FilterPushdown filter_pushdown(*this);
 		plan = filter_pushdown.Rewrite(std::move(plan));
-	});
-
-	RunOptimizer(OptimizerType::LIMIT_PUSHDOWN, [&]() {
-		LimitPushdown limit_pushdown;
-		plan = limit_pushdown.Optimize(std::move(plan));
 	});
 
 	RunOptimizer(OptimizerType::REGEX_RANGE, [&]() {
