@@ -31,13 +31,6 @@ unique_ptr<LogicalOperator> LimitPushdown::Optimize(unique_ptr<LogicalOperator> 
 		op->children[0] = std::move(projection->children[0]);
 		projection->children[0] = std::move(op);
 		swap(projection, op);
-		//		auto &limit = op->Cast<LogicalLimit>();
-		//		auto &proj = (op->children[0])->Cast<LogicalProjection>();
-		//		auto newProj = make_uniq<LogicalProjection>(proj.table_index, std::move(proj.expressions));
-		//		auto newLimit = make_uniq<LogicalLimit>(std::move(limit.limit_val), std::move(limit.offset_val));
-		//		newLimit->AddChild(std::move(proj.children[0]));
-		//		newProj->AddChild(std::move(newLimit));
-		//		op = std::move(newProj);
 	} else {
 		for (auto &child : op->children) {
 			child = Optimize(std::move(child));
