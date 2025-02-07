@@ -1,7 +1,7 @@
 //===----------------------------------------------------------------------===//
 //                         DuckDB
 //
-// cast_column_reader.hpp
+// reader/expression_column_reader.hpp
 //
 //
 //===----------------------------------------------------------------------===//
@@ -9,20 +9,22 @@
 #pragma once
 
 #include "column_reader.hpp"
-#include "templated_column_reader.hpp"
+#include "duckdb/execution/expression_executor.hpp"
 
 namespace duckdb {
 
-//! A column reader that represents a cast over a child reader
-class CastColumnReader : public ColumnReader {
+//! A column reader that executes an expression over a child reader
+class ExpressionColumnReader : public ColumnReader {
 public:
 	static constexpr const PhysicalType TYPE = PhysicalType::INVALID;
 
 public:
-	CastColumnReader(unique_ptr<ColumnReader> child_reader, LogicalType target_type);
+	ExpressionColumnReader(ClientContext &context, unique_ptr<ColumnReader> child_reader, unique_ptr<Expression> expr);
 
 	unique_ptr<ColumnReader> child_reader;
 	DataChunk intermediate_chunk;
+	unique_ptr<Expression> expr;
+	ExpressionExecutor executor;
 
 public:
 	unique_ptr<BaseStatistics> Stats(idx_t row_group_idx_p, const vector<ColumnChunk> &columns) override;
