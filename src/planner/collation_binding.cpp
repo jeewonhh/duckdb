@@ -20,7 +20,7 @@ bool PushVarcharCollation(ClientContext &context, unique_ptr<Expression> &source
 	if (collation.empty()) {
 		Value collation_val;
 		context.TryGetCurrentSetting("default_collation", collation_val);
-		collation = collation_val.IsNull() ? string() : collation_val.ToString();
+		collation = collation_val.ToString();
 	}
 	collation = StringUtil::Lower(collation);
 	// bind the collation
