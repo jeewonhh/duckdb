@@ -1337,14 +1337,6 @@ unique_ptr<QueryResult> ClientContext::Execute(const shared_ptr<Relation> &relat
 }
 
 SettingLookupResult ClientContext::TryGetCurrentSetting(const std::string &key, Value &result) const {
-	// first check the built-in settings
-	auto &db_config = DBConfig::GetConfig(*this);
-	auto option = db_config.GetOptionByName(key);
-	if (option) {
-		result = option->get_setting(*this);
-		return SettingLookupResult(SettingScope::LOCAL);
-	}
-
 	// check the client session values
 	const auto &session_config_map = config.set_variables;
 
@@ -1352,6 +1344,13 @@ SettingLookupResult ClientContext::TryGetCurrentSetting(const std::string &key, 
 	bool found_session_value = session_value != session_config_map.end();
 	if (found_session_value) {
 		result = session_value->second;
+		return SettingLookupResult(SettingScope::LOCAL);
+	}
+	// then check the built-in settings
+	auto &db_config = DBConfig::GetConfig(*this);
+	auto option = db_config.GetOptionByName(key);
+	if (option) {
+		result = option->get_setting(*this);
 		return SettingLookupResult(SettingScope::LOCAL);
 	}
 	// finally check the global session values

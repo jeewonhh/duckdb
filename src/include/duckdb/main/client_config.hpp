@@ -61,6 +61,9 @@ struct ClientConfig {
 	//! The maximum expression depth limit in the parser
 	idx_t max_expression_depth = 1000;
 
+	//! default collation
+	string collation = string();
+
 	//! Whether or not aggressive query verification is enabled
 	bool query_verification_enabled = false;
 	//! Whether or not verification of external operators is enabled, used for testing

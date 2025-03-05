@@ -417,21 +417,26 @@ void DefaultCollationSetting::ResetGlobal(DatabaseInstance *db, DBConfig &config
 }
 
 void DefaultCollationSetting::SetLocal(ClientContext &context, const Value &input) {
-	auto parameter = input.ToString();
+	const auto parameter = input.ToString();
 	// bind the collation to verify that it exists
 	ExpressionBinder::TestCollation(context, parameter);
-	auto &config = DBConfig::GetConfig(context);
-	config.options.collation = parameter;
+	auto &config = ClientConfig::GetConfig(context);
+	config.collation = parameter;
 }
 
 void DefaultCollationSetting::ResetLocal(ClientContext &context) {
-	auto &config = DBConfig::GetConfig(context);
-	config.options.collation = DBConfig().options.collation;
+	auto &config = ClientConfig::GetConfig(context);
+	config.collation = DBConfig().options.collation; // reset to global default value
 }
 
 Value DefaultCollationSetting::GetSetting(const ClientContext &context) {
-	auto &config = DBConfig::GetConfig(context);
-	return Value(config.options.collation);
+	// return session scoped collation if set
+	auto &config = ClientConfig::GetConfig(context);
+	if (!config.collation.empty()) {
+		return Value(config.collation);
+	}
+	auto &db_config = DBConfig::GetConfig(context);
+	return Value(db_config.options.collation);
 }
 
 //===----------------------------------------------------------------------===//

@@ -1,3 +1,5 @@
+#include <duckdb/main/client_context.hpp>
+
 #include "duckdb/catalog/catalog_entry/aggregate_function_catalog_entry.hpp"
 #include "duckdb/common/exception.hpp"
 #include "duckdb/common/operator/comparison_operators.hpp"
@@ -332,7 +334,9 @@ unique_ptr<FunctionData> BindMinMax(ClientContext &context, AggregateFunction &f
                                     vector<unique_ptr<Expression>> &arguments) {
 	if (arguments[0]->return_type.id() == LogicalTypeId::VARCHAR) {
 		auto str_collation = StringType::GetCollation(arguments[0]->return_type);
-		if (!str_collation.empty() || !DBConfig::GetConfig(context).options.collation.empty()) {
+		Value collation_val;
+		context.TryGetCurrentSetting("default_collation", collation_val);
+		if (!str_collation.empty() || !collation_val.IsNull()) {
 			// If aggr function is min/max and uses collations, replace bound_function with arg_min/arg_max
 			// to make sure the result's correctness.
 			string function_name = function.name == "min" ? "arg_min" : "arg_max";

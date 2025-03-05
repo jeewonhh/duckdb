@@ -2,6 +2,7 @@
 #include "duckdb/catalog/catalog_entry/collate_catalog_entry.hpp"
 #include "duckdb/catalog/catalog_entry/scalar_function_catalog_entry.hpp"
 #include "duckdb/planner/expression/bound_function_expression.hpp"
+#include "duckdb/main/client_context.hpp"
 #include "duckdb/main/config.hpp"
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/function/function_binder.hpp"
@@ -15,12 +16,11 @@ bool PushVarcharCollation(ClientContext &context, unique_ptr<Expression> &source
 		return false;
 	}
 	// replace default collation with system collation
-	auto str_collation = StringType::GetCollation(sql_type);
-	string collation;
-	if (str_collation.empty()) {
-		collation = DBConfig::GetConfig(context).options.collation;
-	} else {
-		collation = str_collation;
+	auto collation = StringType::GetCollation(sql_type);
+	if (collation.empty()) {
+		Value collation_val;
+		context.TryGetCurrentSetting("default_collation", collation_val);
+		collation = collation_val.IsNull() ? string() : collation_val.ToString();
 	}
 	collation = StringUtil::Lower(collation);
 	// bind the collation
