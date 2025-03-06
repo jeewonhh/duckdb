@@ -20,7 +20,8 @@ LogicalInsert::LogicalInsert(ClientContext &context, const unique_ptr<CreateInfo
 }
 
 idx_t LogicalInsert::EstimateCardinality(ClientContext &context) {
-	return return_chunk ? LogicalOperator::EstimateCardinality(context) : 1;
+	const auto card = return_chunk ? LogicalOperator::EstimateCardinality(context) : 1;
+	return SetEstimatedCardinality(card);
 }
 
 vector<idx_t> LogicalInsert::GetTableIndex() const {

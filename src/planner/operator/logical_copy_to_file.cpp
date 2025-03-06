@@ -153,7 +153,7 @@ vector<ColumnBinding> LogicalCopyToFile::GetColumnBindings() {
 }
 
 idx_t LogicalCopyToFile::EstimateCardinality(ClientContext &context) {
-	return 1;
+	return SetEstimatedCardinality(1);
 }
 
 } // namespace duckdb

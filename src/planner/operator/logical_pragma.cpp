@@ -3,7 +3,7 @@
 namespace duckdb {
 
 idx_t LogicalPragma::EstimateCardinality(ClientContext &context) {
-	return 1;
+	return SetEstimatedCardinality(1);
 }
 
 } // namespace duckdb

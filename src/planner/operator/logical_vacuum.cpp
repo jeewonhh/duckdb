@@ -59,7 +59,7 @@ unique_ptr<LogicalOperator> LogicalVacuum::Deserialize(Deserializer &deserialize
 }
 
 idx_t LogicalVacuum::EstimateCardinality(ClientContext &context) {
-	return 1;
+	return SetEstimatedCardinality(1);
 }
 
 } // namespace duckdb

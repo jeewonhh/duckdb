@@ -36,9 +36,10 @@ void LogicalOperator::SetParamsEstimatedCardinality(InsertionOrderPreservingMap<
 	}
 }
 
-void LogicalOperator::SetEstimatedCardinality(idx_t _estimated_cardinality) {
+idx_t LogicalOperator::SetEstimatedCardinality(idx_t _estimated_cardinality) {
 	estimated_cardinality = _estimated_cardinality;
 	has_estimated_cardinality = true;
+	return estimated_cardinality;
 }
 
 // LCOV_EXCL_START
@@ -198,12 +199,10 @@ idx_t LogicalOperator::EstimateCardinality(ClientContext &context) {
 		return estimated_cardinality;
 	}
 	idx_t max_cardinality = 0;
-	for (auto &child : children) {
+	for (const auto &child : children) {
 		max_cardinality = MaxValue(child->EstimateCardinality(context), max_cardinality);
 	}
-	has_estimated_cardinality = true;
-	estimated_cardinality = max_cardinality;
-	return estimated_cardinality;
+	return SetEstimatedCardinality(max_cardinality);
 }
 
 void LogicalOperator::Print() {

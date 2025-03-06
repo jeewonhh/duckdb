@@ -12,9 +12,9 @@ LogicalTopN::~LogicalTopN() {
 idx_t LogicalTopN::EstimateCardinality(ClientContext &context) {
 	auto child_cardinality = LogicalOperator::EstimateCardinality(context);
 	if (child_cardinality < limit) {
-		return child_cardinality;
+		return SetEstimatedCardinality(child_cardinality);
 	}
-	return limit;
+	return SetEstimatedCardinality(limit);
 }
 
 } // namespace duckdb

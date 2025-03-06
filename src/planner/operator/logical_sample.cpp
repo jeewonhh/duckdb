@@ -20,16 +20,16 @@ idx_t LogicalSample::EstimateCardinality(ClientContext &context) {
 		double sample_cardinality =
 		    double(child_cardinality) * (sample_options->sample_size.GetValue<double>() / 100.0);
 		if (sample_cardinality > double(child_cardinality)) {
-			return child_cardinality;
+			return SetEstimatedCardinality(child_cardinality);
 		}
-		return idx_t(sample_cardinality);
+		return SetEstimatedCardinality(idx_t(sample_cardinality));
 	} else {
 		auto sample_size = sample_options->sample_size.GetValue<uint64_t>();
 		if (sample_size < child_cardinality) {
-			return sample_size;
+			return SetEstimatedCardinality(sample_size);
 		}
 	}
-	return child_cardinality;
+	return SetEstimatedCardinality(child_cardinality);
 }
 
 void LogicalSample::ResolveTypes() {

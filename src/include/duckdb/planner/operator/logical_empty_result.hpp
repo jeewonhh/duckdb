@@ -35,7 +35,7 @@ public:
 	void Serialize(Serializer &serializer) const override;
 	static unique_ptr<LogicalOperator> Deserialize(Deserializer &deserializer);
 	idx_t EstimateCardinality(ClientContext &context) override {
-		return 0;
+		return SetEstimatedCardinality(0);
 	}
 
 protected:

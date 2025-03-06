@@ -18,7 +18,8 @@ LogicalUpdate::LogicalUpdate(ClientContext &context, const unique_ptr<CreateInfo
 }
 
 idx_t LogicalUpdate::EstimateCardinality(ClientContext &context) {
-	return return_chunk ? LogicalOperator::EstimateCardinality(context) : 1;
+	const auto card = return_chunk ? LogicalOperator::EstimateCardinality(context) : 1;
+	return SetEstimatedCardinality(card);
 }
 
 vector<ColumnBinding> LogicalUpdate::GetColumnBindings() {

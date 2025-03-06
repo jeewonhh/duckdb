@@ -191,13 +191,13 @@ idx_t LogicalGet::EstimateCardinality(ClientContext &context) {
 	if (function.cardinality) {
 		auto node_stats = function.cardinality(context, bind_data.get());
 		if (node_stats && node_stats->has_estimated_cardinality) {
-			return node_stats->estimated_cardinality;
+			return SetEstimatedCardinality(node_stats->estimated_cardinality);
 		}
 	}
 	if (!children.empty()) {
-		return children[0]->EstimateCardinality(context);
+		return SetEstimatedCardinality(children[0]->EstimateCardinality(context));
 	}
-	return 1;
+	return SetEstimatedCardinality(1);
 }
 
 void LogicalGet::Serialize(Serializer &serializer) const {

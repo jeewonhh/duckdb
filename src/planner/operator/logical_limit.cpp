@@ -25,7 +25,7 @@ idx_t LogicalLimit::EstimateCardinality(ClientContext &context) {
 	default:
 		break;
 	}
-	return child_cardinality;
+	return SetEstimatedCardinality(child_cardinality);
 }
 
 void LogicalLimit::ResolveTypes() {

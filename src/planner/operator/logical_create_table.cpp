@@ -17,7 +17,7 @@ LogicalCreateTable::LogicalCreateTable(ClientContext &context, unique_ptr<Create
 }
 
 idx_t LogicalCreateTable::EstimateCardinality(ClientContext &context) {
-	return 1;
+	return SetEstimatedCardinality(1);
 }
 
 void LogicalCreateTable::ResolveTypes() {

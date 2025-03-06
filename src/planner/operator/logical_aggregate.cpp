@@ -66,7 +66,7 @@ InsertionOrderPreservingMap<string> LogicalAggregate::ParamsToString() const {
 idx_t LogicalAggregate::EstimateCardinality(ClientContext &context) {
 	if (groups.empty()) {
 		// ungrouped aggregate
-		return 1;
+		return SetEstimatedCardinality(1);
 	}
 	return LogicalOperator::EstimateCardinality(context);
 }

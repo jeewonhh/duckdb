@@ -38,7 +38,7 @@ public:
 	static unique_ptr<LogicalOperator> Deserialize(Deserializer &deserializer);
 
 	idx_t EstimateCardinality(ClientContext &context) override {
-		return 3;
+		return SetEstimatedCardinality(3);
 	}
 	//! Skips the serialization check in VerifyPlan
 	bool SupportSerialization() const override {

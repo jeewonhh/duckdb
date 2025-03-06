@@ -13,7 +13,7 @@ LogicalCreate::LogicalCreate(LogicalOperatorType type, ClientContext &context, u
 }
 
 idx_t LogicalCreate::EstimateCardinality(ClientContext &context) {
-	return 1;
+	return SetEstimatedCardinality(1);
 }
 
 void LogicalCreate::ResolveTypes() {

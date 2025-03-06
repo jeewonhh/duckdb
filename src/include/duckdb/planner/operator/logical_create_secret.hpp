@@ -27,7 +27,7 @@ public:
 
 public:
 	idx_t EstimateCardinality(ClientContext &context) override {
-		return 1;
+		return SetEstimatedCardinality(1);
 	};
 
 	//! Skips the serialization check in VerifyPlan

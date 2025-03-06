@@ -108,6 +108,7 @@ void Optimizer::RunBuiltInOptimizers() {
 	case LogicalOperatorType::LOGICAL_EXTENSION_OPERATOR:
 		// skip optimizing simple & often-occurring plans unaffected by rewrites
 		if (plan->children.empty()) {
+			plan->EstimateCardinality(context);
 			return;
 		}
 		break;
@@ -267,6 +268,15 @@ void Optimizer::RunBuiltInOptimizers() {
 	});
 }
 
+static bool OperatorHasCardinality(LogicalOperator &op) {
+	for (auto &child : op.children) {
+		if (!OperatorHasCardinality(*child)) {
+			return false;
+		}
+	}
+	return op.has_estimated_cardinality;
+}
+
 unique_ptr<LogicalOperator> Optimizer::Optimize(unique_ptr<LogicalOperator> plan_p) {
 	Verify(*plan_p);
 
@@ -293,7 +303,9 @@ unique_ptr<LogicalOperator> Optimizer::Optimize(unique_ptr<LogicalOperator> plan
 	}
 
 	Planner::VerifyPlan(context, plan);
-
+#ifdef DEBUG
+	D_ASSERT(OperatorHasCardinality(*plan));
+#endif
 	return std::move(plan);
 }
 
