@@ -764,6 +764,7 @@ unique_ptr<DataChunk> JoinFilterPushdownInfo::Finalize(ClientContext &context, o
 	}
 
 	auto dynamic_or_filter_threshold = DBConfig::GetSetting<DynamicOrFilterThresholdSetting>(context);
+	auto late_materialization_max_rows = DBConfig::GetSetting<LateMaterializationMaxRowsSetting>(context);
 	// create a filter for each of the aggregates
 	for (idx_t filter_idx = 0; filter_idx < join_condition.size(); filter_idx++) {
 		const auto cmp = op.conditions[join_condition[filter_idx]].comparison;
@@ -782,7 +783,7 @@ unique_ptr<DataChunk> JoinFilterPushdownInfo::Finalize(ClientContext &context, o
 			}
 			// if the HT is small we can generate a complete "OR" filter
 			// but only if the join condition is equality.
-			if (ht && ht->Count() > 1 && ht->Count() <= dynamic_or_filter_threshold &&
+			if (ht && ht->Count() > 1 && (ht->Count() <= dynamic_or_filter_threshold || ht->Count() <= late_materialization_max_rows) &&
 			    cmp == ExpressionType::COMPARE_EQUAL) {
 				PushInFilter(info, *ht, op, filter_idx, filter_col_idx);
 			}
