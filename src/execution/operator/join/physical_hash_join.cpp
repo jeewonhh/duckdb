@@ -783,7 +783,8 @@ unique_ptr<DataChunk> JoinFilterPushdownInfo::Finalize(ClientContext &context, o
 			}
 			// if the HT is small we can generate a complete "OR" filter
 			// but only if the join condition is equality.
-			if (ht && ht->Count() > 1 && (ht->Count() <= dynamic_or_filter_threshold || ht->Count() <= late_materialization_max_rows) &&
+			if (ht && ht->Count() > 1 &&
+			    (ht->Count() <= dynamic_or_filter_threshold || ht->Count() <= late_materialization_max_rows) &&
 			    cmp == ExpressionType::COMPARE_EQUAL) {
 				PushInFilter(info, *ht, op, filter_idx, filter_col_idx);
 			}
