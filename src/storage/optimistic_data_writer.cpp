@@ -65,8 +65,10 @@ void OptimisticDataWriter::WriteNewRowGroup(OptimisticWriteCollection &row_group
 		return;
 	}
 
-	row_groups.unflushed_row_groups.insert(row_groups.complete_row_groups);
-	row_groups.complete_row_groups++;
+	if (row_groups.complete_row_groups + 1 < row_groups.collection->GetRowGroupCount()) {
+		row_groups.unflushed_row_groups.insert(row_groups.complete_row_groups);
+		row_groups.complete_row_groups++;
+	}
 	auto allocated_size = row_groups.collection->GetAllocationSize();
 	if (row_groups.prev_allocated_size > allocated_size) {
 		throw InternalException("Row group prev allocated size is larger than currently allocated size");
