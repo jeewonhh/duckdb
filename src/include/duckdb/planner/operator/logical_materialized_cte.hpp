@@ -30,6 +30,8 @@ public:
 	}
 
 	CTEMaterialize materialize = CTEMaterialize::CTE_MATERIALIZE_ALWAYS;
+	//! Execute this CTE even when nothing references it, and never inline it (trigger bodies)
+	bool must_execute = false;
 
 public:
 	InsertionOrderPreservingMap<string> ParamsToString() const override;

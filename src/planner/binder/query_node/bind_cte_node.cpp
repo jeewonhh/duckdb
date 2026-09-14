@@ -21,6 +21,8 @@ struct BoundCTEData {
 	TableIndex setop_index;
 	shared_ptr<Binder> child_binder;
 	shared_ptr<CTEBindState> cte_bind_state;
+	//! Must execute even if unreferenced, because nothing references it (trigger bodies)
+	bool must_execute = false;
 };
 
 static bool IsDMLQueryNode(QueryNodeType t) {
@@ -158,6 +160,8 @@ BoundCTEData Binder::PrepareCTE(const Identifier &ctename, CommonTableExpression
 
 	result.ctename = ctename;
 	result.materialized = statement.materialized;
+	// Trigger expansion never generates a CTE that is optional: nothing references a trigger body.
+	result.must_execute = statement.is_trigger_generated;
 	result.setop_index = GenerateTableIndex();
 
 	// instead of eagerly binding the CTE here we add the CTE bind state to the list of CTE bindings
@@ -177,7 +181,7 @@ BoundCTEData Binder::PrepareCTE(const Identifier &ctename, CommonTableExpression
 BoundStatement Binder::FinishCTE(BoundCTEData &bound_cte, BoundStatement child) {
 	if (!bound_cte.cte_bind_state->IsBound()) {
 		auto node_type = bound_cte.cte_bind_state->cte_def.type;
-		bool has_side_effects = IsSideEffectingQueryNode(node_type);
+		bool has_side_effects = IsSideEffectingQueryNode(node_type) || bound_cte.must_execute;
 		if (has_side_effects) {
 			// Side-effecting CTEs always execute even if not referenced - force bind now
 			auto dummy_binding =
@@ -207,6 +211,7 @@ BoundStatement Binder::FinishCTE(BoundCTEData &bound_cte, BoundStatement child) 
 
 	auto root = make_uniq<LogicalMaterializedCTE>(bound_cte.ctename, bound_cte.setop_index, result.types.size(),
 	                                              std::move(cte_query), std::move(cte_child), bound_cte.materialized);
+	root->must_execute = bound_cte.must_execute;
 
 	result.plan = std::move(root);
 	return result;

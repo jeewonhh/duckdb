@@ -22,7 +22,7 @@ static bool ContainsRecursiveCTE(const LogicalOperator &op) {
 PhysicalOperator &PhysicalPlanGenerator::CreatePlan(LogicalMaterializedCTE &op) {
 	D_ASSERT(op.children.size() == 2);
 
-	auto cte_body_has_side_effects = op.children[0]->HasSideEffects();
+	auto cte_body_has_side_effects = op.children[0]->HasSideEffects() || op.must_execute;
 	auto use_exchange = planning_recursive_cte_depth == 0 && !ContainsRecursiveCTE(*op.children[0]) &&
 	                    !ContainsRecursiveCTE(*op.children[1]);
 

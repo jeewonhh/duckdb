@@ -656,6 +656,12 @@
         "name": "materialize",
         "type": "CTEMaterialize",
         "default": "CTEMaterialize::CTE_MATERIALIZE_DEFAULT"
+      },
+      {
+        "id": 204,
+        "name": "must_execute",
+        "type": "bool",
+        "default": "false"
       }
     ]
   },

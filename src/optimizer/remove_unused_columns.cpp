@@ -24,6 +24,7 @@
 #include "duckdb/planner/operator/logical_recursive_cte.hpp"
 #include "duckdb/planner/operator/logical_set_operation.hpp"
 #include "duckdb/planner/operator/logical_cte.hpp"
+#include "duckdb/planner/operator/logical_materialized_cte.hpp"
 #include "duckdb/planner/operator/logical_cteref.hpp"
 #include "duckdb/function/scalar/struct_utils.hpp"
 #include "duckdb/function/scalar/variant_utils.hpp"
@@ -694,8 +695,12 @@ void RemoveUnusedColumns::VisitOperator(unique_ptr<LogicalOperator> &op_ref) {
 			}
 		}
 
+		// A CTE that executes for its side effects alone has no reader to tell us which columns matter, and the
+		// fallback below would keep only the first one. Keep all of them.
+		auto side_effects_only = op.Cast<LogicalMaterializedCTE>().must_execute && referenced_columns_in_rhs.empty();
+
 		// Distinct column indexes here, unlike the per-reader map, so comparing sizes is a valid width check.
-		if (cte_map_entry.everything_referenced || readers_visible_in_output ||
+		if (cte_map_entry.everything_referenced || readers_visible_in_output || side_effects_only ||
 		    referenced_columns_in_rhs.size() == cte.children[0]->GetColumnBindings().size()) {
 			if (!analyze) {
 				everything_referenced = true;

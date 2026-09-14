@@ -149,7 +149,7 @@ void CTEInlining::TryInlining(unique_ptr<LogicalOperator> &op) {
 		auto &cte = op->Cast<LogicalMaterializedCTE>();
 		auto ref_count = CountCTEReferences(*op, cte.table_index);
 		if (ref_count == 0) {
-			if (cte.children[0]->HasSideEffects()) {
+			if (cte.children[0]->HasSideEffects() || cte.must_execute) {
 				// Side-effecting CTEs must always execute even when unreferenced
 				return;
 			}
@@ -157,7 +157,7 @@ void CTEInlining::TryInlining(unique_ptr<LogicalOperator> &op) {
 			op = std::move(op->children[1]);
 			return;
 		}
-		if (cte.children[0]->HasSideEffects()) {
+		if (cte.children[0]->HasSideEffects() || cte.must_execute) {
 			// Never inline a side-effecting CTE: the LOGICAL_MATERIALIZED_CTE guarantees
 			// that it executes exactly once and before the query side.
 			return;

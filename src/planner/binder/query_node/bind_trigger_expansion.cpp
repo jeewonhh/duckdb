@@ -713,6 +713,8 @@ BoundStatement Binder::ExpandRowTriggers(QueryNode &node, vector<unique_ptr<Pars
 	auto trigger_mat_cte =
 	    make_uniq<LogicalMaterializedCTE>(trigger_cte_name, trigger_cte_idx, col_types.size(), std::move(trigger_plan),
 	                                      std::move(outer_query), CTEMaterialize::CTE_MATERIALIZE_DEFAULT);
+	// Nothing reads the firings, so this CTE is kept on the strength of being a trigger body alone.
+	trigger_mat_cte->must_execute = true;
 	trigger_mat_cte->ResolveOperatorTypes();
 
 	bound.plan->children[1] = std::move(trigger_mat_cte);

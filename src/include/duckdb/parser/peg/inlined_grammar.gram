@@ -1056,7 +1056,7 @@ StoredGeneratedColumn <- 'STORED'
 
 CreateTriggerStmt <- 'TRIGGER' IfNotExists? TriggerName TriggerTiming TriggerEvent 'ON' BaseTableName ReferencingClause? ForEachClause? TriggerBody
 
-TriggerBody <- InsertStatement / UpdateStatement / DeleteStatement / MergeIntoStatement
+TriggerBody <- InsertStatement / UpdateStatement / DeleteStatement / MergeIntoStatement / SelectStatement
 TriggerName <- Identifier
 
 ReferencingClause <- 'REFERENCING' ReferencingItem ReferencingItem?
