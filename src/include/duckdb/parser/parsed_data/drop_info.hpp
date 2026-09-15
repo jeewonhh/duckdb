@@ -18,6 +18,11 @@
 namespace duckdb {
 struct ExtraDropInfo;
 
+//! The qualified name of the entry to drop. Its shape depends on the entry type: a regular entry is named
+//! [catalog, schema..., name], but a schema is named [catalog, parent schemas..., schema] - one component shorter,
+//! because the schema being dropped is itself the trailing component. GetCatalog()/SetCatalog() read and write the
+//! catalog for either shape; the generic QualifiedName::Catalog() and WithCatalog() only handle the former, and on
+//! a schema path they report no catalog and insert one instead of replacing it.
 struct DropInfo : public ParseInfo {
 public:
 	static constexpr const ParseInfoType TYPE = ParseInfoType::DROP_INFO;
@@ -57,9 +62,13 @@ public:
 	void SetSchema(Identifier schema) {
 		qualified_name = QualifiedName(qualified_name.Catalog(), std::move(schema), qualified_name.Name());
 	}
-	void SetCatalog(Identifier catalog) {
-		qualified_name = qualified_name.WithCatalog(std::move(catalog));
-	}
+	//! The catalog the entry is dropped from, empty when the name carries none. For a schema this reads the leading
+	//! component, which is only the catalog once the name has been resolved by the binder - on an unbound name it
+	//! may still be the outermost parent schema (CreateSchemaInfo::SchemaCatalog has the same precondition).
+	const Identifier &GetCatalog() const;
+	//! Replace the catalog component of the name, adding one when the name does not carry it yet. Same precondition
+	//! as GetCatalog for schemas.
+	void SetCatalog(Identifier catalog);
 
 public:
 	virtual unique_ptr<DropInfo> Copy() const;

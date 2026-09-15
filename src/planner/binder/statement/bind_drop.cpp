@@ -45,9 +45,8 @@ BoundStatement Binder::Bind(DropStatement &stmt) {
 		// resolve the leading component of the dotted path into a catalog, leaving the path as
 		// [catalog, parent schemas..., schema] (mirrors CREATE SCHEMA - see Binder::BindCreateSchema)
 		stmt.info->SetQualifiedName(ResolveCatalog(context, stmt.info->GetQualifiedName()));
-		// dropping a schema is never read-only because there are no temporary schemas. The catalog is the leading
-		// component of the resolved path ([catalog, parent schemas..., schema])
-		auto &catalog = Catalog::GetCatalog(context, stmt.info->GetQualifiedName().Path().front());
+		// dropping a schema is never read-only because there are no temporary schemas
+		auto &catalog = Catalog::GetCatalog(context, stmt.info->GetCatalog());
 		properties.RegisterDBModify(catalog, context, DatabaseModificationType::DROP_CATALOG_ENTRY);
 		break;
 	}
