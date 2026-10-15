@@ -398,7 +398,15 @@ shared_ptr<PreparedStatementData> ClientContext::CreatePreparedStatement(ClientC
 		// an extension wants to do a rebind - do it once
 	}
 
-	return CreatePreparedStatementInternal(lock, std::move(statement), parameters);
+	auto result = CreatePreparedStatementInternal(lock, std::move(statement), parameters);
+	// the rebound statement is the one that is kept, so finalized this as well
+	for (auto &state : registered_state->States()) {
+		auto info = state->OnFinalizePrepare(*this, *result, PreparedStatementMode::PREPARE_AND_EXECUTE);
+		if (info == RebindQueryInfo::ATTEMPT_TO_REBIND) {
+			throw CatalogException("The prepared statement had to be rebound again after it was rebound once");
+		}
+	}
+	return result;
 }
 
 QueryProgress ClientContext::GetQueryProgress() {
